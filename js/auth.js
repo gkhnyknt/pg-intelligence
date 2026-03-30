@@ -24,7 +24,7 @@ export function handleLogin(event) {
     errorBox.classList.add('hidden');
 
     const expectedUser = 'YWRtaW4=';         // "admin"
-    const expectedPass = 'UGlyaSExOTIzLiw='; // "Piri!1923.,"
+    const expectedPass = 'MTIzNDU2'; // "123456"
 
     setTimeout(() => {
         if (btoa(userStr) === expectedUser && btoa(passStr) === expectedPass) {
