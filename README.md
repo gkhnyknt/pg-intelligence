@@ -1,3 +1,7 @@
+![PG Intelligence Ana Ekran](https://github.com/gkhnyknt/pg-intelligence/blob/main/images/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202026-03-31%20005648.png)
+
+
+
 # PG Intelligence — Database Control Center 🚀
 
 **PG Intelligence**, PostgreSQL veritabanlarınızı tek bir merkezden izlemenizi, analiz etmenizi ve yönetmenizi sağlayan modern, hızlı ve profesyonel bir veritabanı kontrol panelidir. 
@@ -18,6 +22,8 @@ Python (FastAPI) arka ucu ve tamamen Vanilla JS + TailwindCSS kullanılarak geli
 
 ---
 
+![PG Intelligence Ana Ekran](https://github.com/gkhnyknt/pg-intelligence/blob/main/images/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202026-03-31%20005901.png)
+
 ## 🛠️ Kurulum Gereksinimleri
 
 ### 1. PostgreSQL Yapılandırması (Kritik)
@@ -35,6 +41,8 @@ log_destination = 'csvlog'
 # 3. Uzun Sorguların Analizi (Smart Analyze) İçin Kesilmeyi Önleme:
 track_activity_query_size = 4096  # veya 8192
 ```
+
+![PG Intelligence Ana Ekran](https://github.com/gkhnyknt/pg-intelligence/blob/main/images/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202026-03-31%20010030.png)
 
 ##  🚀 Başlangıç ve Kurulum
 ### Adım 1: Projeyi Klonlayın
@@ -71,6 +79,7 @@ DB2_DBNAME=postgres
 DB2_LOG_PATH=C:/Program Files/PostgreSQL/14/data/log
 
 ```
+![PG Intelligence Ana Ekran](https://raw.githubusercontent.com/gkhnyknt/pg-intelligence/refs/heads/main/images/Ekran%20g%C3%B6r%C3%BCnt%C3%BCs%C3%BC%202026-03-31%20005611.png)
 
 
 Tarayıcınızda şu adrese gidin:
