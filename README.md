@@ -72,22 +72,10 @@ DB2_LOG_PATH=C:/Program Files/PostgreSQL/14/data/log
 
 ```
 
-API Sunucu Portu
-
-```ini
-API_PORT=8000
-```
-
-### Adım 4: Uygulamayı Başlatın
-Aşağıdaki komut ile FastAPI sunucusunu başlatın. Sunucu, arka plan verilerini çekerken aynı zamanda statik HTML/JS/CSS arayüzünü de yayınlayacaktır.
-
-```bash
-python main.py
-```
 
 Tarayıcınızda şu adrese gidin:
 
-http://localhost:8000
+http://localhost:3000
 
 ## Varsayılan Giriş Bilgileri:
 
