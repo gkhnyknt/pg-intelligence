@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - PG Intelligence</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="css/style.css" rel="stylesheet">
+    
+    <script>
+        // Tema kontrolü
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.classList.remove('dark');
+        } else {
+            document.documentElement.classList.add('dark');
+        }
+
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: { bgbase: '#020617', panel: '#0F172A', panelborder: '#1E293B' },
+                    fontFamily: { 
+                        sans: ['"Century Gothic"', 'sans-serif'], 
+                        mono: ['"Century Gothic"', 'sans-serif'] 
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-[#060c1c] dark:text-slate-300 font-sans antialiased flex items-center justify-center h-screen overflow-hidden relative">
+
+    <div class="absolute top-1/2 -left-32 w-[35rem] h-[40rem] bg-[#336791] rounded-full filter blur-[120px] opacity-40 dark:opacity-30 animate-pulse -translate-y-1/2 pointer-events-none z-0"></div>
+    
+    <div class="absolute top-1/2 -right-32 w-[35rem] h-[40rem] bg-[#336791] rounded-full filter blur-[120px] opacity-40 dark:opacity-30 animate-pulse -translate-y-1/2 pointer-events-none z-0" style="animation-delay: 1.5s;"></div>
+
+    <div class="glass-panel w-full max-w-md mx-4 p-8 rounded-2xl shadow-2xl relative z-10 fade-in border border-slate-200 dark:border-slate-700/50">
+        
+        <div class="flex flex-col items-center gap-3 mb-8">
+            <div class="relative flex items-center justify-center w-12 h-12 bg-blue-100 dark:bg-blue-900/50 rounded-xl border border-blue-200 dark:border-blue-700/50 shadow-inner">
+                <svg class="w-7 h-7 text-[#336791] dark:text-[#6cb4ee] drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">PG <span class="text-[#336791] dark:text-[#6cb4ee] font-medium">Intelligence</span></h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400 text-center">Veritabanı kontrol paneline erişmek için giriş yapın.</p>
+        </div>
+
+        <form id="loginForm" class="space-y-5" onsubmit="handleLogin(event)">
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">Kullanıcı Adı</label>
+                <input type="text" id="username" required autocomplete="off"
+                    class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#336791] focus:ring-1 focus:ring-[#336791] transition-all placeholder-slate-400 dark:placeholder-slate-600 relative z-20" 
+                    placeholder="admin">
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">Şifre</label>
+                <input type="password" id="password" required autocomplete="current-password"
+                    class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#336791] focus:ring-1 focus:ring-[#336791] transition-all placeholder-slate-400 dark:placeholder-slate-600 relative z-20" 
+                    placeholder="••••••••">
+            </div>
+
+            <div id="errorBox" class="hidden bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 text-rose-600 dark:text-rose-400 text-xs px-3 py-2 rounded-lg text-center font-medium">
+                Geçersiz kullanıcı adı veya şifre.
+            </div>
+
+            <button type="submit" id="submitBtn" class="w-full bg-[#336791] hover:bg-[#28557a] text-white font-semibold rounded-lg px-4 py-2.5 transition-all shadow-lg shadow-[#336791]/30 flex items-center justify-center gap-2 group relative z-20">
+                <svg id="spinner" class="w-4 h-4 text-white animate-spin hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <span id="btnText">Giriş Yap</span>
+                <svg id="btnIcon" class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+        </form>
+    </div>
+
+    <script>
+        function handleLogin(event) {
+            event.preventDefault(); 
+            
+            const userStr = document.getElementById('username').value.trim();
+            const passStr = document.getElementById('password').value.trim();
+            const errorBox = document.getElementById('errorBox');
+            
+            document.getElementById('btnText').innerText = 'Doğrulanıyor...';
+            document.getElementById('btnIcon').classList.add('hidden');
+            document.getElementById('spinner').classList.remove('hidden');
+            document.getElementById('submitBtn').disabled = true;
+            errorBox.classList.add('hidden');
+
+            // Şifreler Base64 formatında tutuluyor
+            const expectedUser = 'YWRtaW4=';         // "admin"
+            const expectedPass = 'UGlyaSExOTIzLiw='; // "Piri!1923.,"
+
+            setTimeout(() => {
+                if (btoa(userStr) === expectedUser && btoa(passStr) === expectedPass) {
+                    sessionStorage.setItem('pg_auth_token', 'true');
+                    window.location.href = 'index.html'; 
+                } else {
+                    errorBox.innerText = 'Hatalı kullanıcı adı veya şifre!';
+                    errorBox.classList.remove('hidden');
+                    
+                    document.getElementById('btnText').innerText = 'Giriş Yap';
+                    document.getElementById('btnIcon').classList.remove('hidden');
+                    document.getElementById('spinner').classList.add('hidden');
+                    document.getElementById('submitBtn').disabled = false;
+                }
+            }, 800); 
+        }
+    </script>
+</body>
+</html>

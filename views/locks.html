@@ -1,0 +1,22 @@
+<div class="p-4">
+    <div class="mb-3">
+        <h2 class="text-sm font-bold text-slate-800 dark:text-white">Lock Monitor</h2>
+        <p class="text-[10px] text-slate-500 mt-0.5">Blocked and waiting queries — real-time</p>
+    </div>
+    <div id="locksEmpty" class="glass rounded-xl p-8 text-center">
+        <p class="text-2xl mb-2">🔓</p>
+        <p class="text-sm font-semibold text-slate-500">No locks detected</p>
+        <p class="text-[10px] text-slate-400 mt-1">All queries are running freely</p>
+    </div>
+    <div id="locksTable" class="glass rounded-xl overflow-hidden hidden">
+        <div class="overflow-x-auto">
+            <table class="data-table w-full">
+                <thead><tr>
+                    <th>Blocked PID</th><th>User</th><th>Duration</th>
+                    <th>Blocking PID</th><th>Lock Type</th><th class="w-full">Query</th>
+                </tr></thead>
+                <tbody id="tbodyLocks"></tbody>
+            </table>
+        </div>
+    </div>
+</div>

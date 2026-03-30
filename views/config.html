@@ -1,0 +1,166 @@
+<div class="p-4">
+    <div class="mb-3">
+        <h2 class="text-sm font-bold text-slate-800 dark:text-white">Configuration Advisor</h2>
+        <p class="text-[10px] text-slate-500 mt-0.5">Live PostgreSQL tuning & performance values (SHOW ALL)</p>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+        
+        <div class="glass rounded-xl p-4 transition-transform hover:-translate-y-1">
+            <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7"/></svg>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-700 dark:text-slate-200">shared_buffers</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Primary memory cache for PostgreSQL. Should generally be set to 25% of total system RAM. Too low causes high disk I/O.</p>
+                    <code id="conf_shared_buffers" class="text-[10px] bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-transparent px-2 py-1 rounded mt-2 inline-block font-mono tracking-wide text-slate-800 dark:text-slate-200">Yükleniyor...</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass rounded-xl p-4 transition-transform hover:-translate-y-1">
+            <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-700 dark:text-slate-200">effective_cache_size</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Helps query planner estimate total available memory (shared_buffers + OS cache). Set to 50%-75% of total RAM for better index usage.</p>
+                    <code id="conf_effective_cache_size" class="text-[10px] bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-transparent px-2 py-1 rounded mt-2 inline-block font-mono tracking-wide text-slate-800 dark:text-slate-200">Yükleniyor...</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass rounded-xl p-4 transition-transform hover:-translate-y-1">
+            <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-700 dark:text-slate-200">work_mem</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Controls memory for ORDER BY, DISTINCT, and Hash Joins. Low values cause disk spills. Recommended: 16MB–128MB per connection.</p>
+                    <code id="conf_work_mem" class="text-[10px] bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-transparent px-2 py-1 rounded mt-2 inline-block font-mono tracking-wide text-slate-800 dark:text-slate-200">Yükleniyor...</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass rounded-xl p-4 transition-transform hover:-translate-y-1">
+            <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-700 dark:text-slate-200">maintenance_work_mem</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Memory used for maintenance tasks (VACUUM, CREATE INDEX, ALTER TABLE). Set it higher than work_mem to speed up these operations.</p>
+                    <code id="conf_maintenance_work_mem" class="text-[10px] bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-transparent px-2 py-1 rounded mt-2 inline-block font-mono tracking-wide text-slate-800 dark:text-slate-200">Yükleniyor...</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass rounded-xl p-4 transition-transform hover:-translate-y-1">
+            <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-fuchsia-500/10 border border-fuchsia-500/20 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-fuchsia-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-700 dark:text-slate-200">random_page_cost</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Cost of a non-sequentially-fetched disk page. Default is 4.0. If you use fast SSDs/NVMe, set this to 1.1 so planner uses indexes more often.</p>
+                    <code id="conf_random_page_cost" class="text-[10px] bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-transparent px-2 py-1 rounded mt-2 inline-block font-mono tracking-wide text-slate-800 dark:text-slate-200">Yükleniyor...</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass rounded-xl p-4 transition-transform hover:-translate-y-1">
+            <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-700 dark:text-slate-200">effective_io_concurrency</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Tells PostgreSQL how many concurrent disk I/O operations can be executed. For SSDs, set between 100 to 300 to boost Bitmap Heap Scans.</p>
+                    <code id="conf_effective_io_concurrency" class="text-[10px] bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-transparent px-2 py-1 rounded mt-2 inline-block font-mono tracking-wide text-slate-800 dark:text-slate-200">Yükleniyor...</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass rounded-xl p-4 transition-transform hover:-translate-y-1">
+            <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-700 dark:text-slate-200">idle_in_transaction_session_timeout</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Kills sessions left 'idle in transaction' after specified time. Prevents bad app code from holding row locks forever and blocking VACUUM.</p>
+                    <code id="conf_idle_in_transaction_session_timeout" class="text-[10px] bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-transparent px-2 py-1 rounded mt-2 inline-block font-mono tracking-wide text-slate-800 dark:text-slate-200">Yükleniyor...</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass rounded-xl p-4 transition-transform hover:-translate-y-1">
+            <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-pink-500/10 border border-pink-500/20 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-700 dark:text-slate-200">statement_timeout</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Aborts any query that takes longer than the specified milliseconds. Great safety net against runaway queries causing 100% CPU usage.</p>
+                    <code id="conf_statement_timeout" class="text-[10px] bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-transparent px-2 py-1 rounded mt-2 inline-block font-mono tracking-wide text-slate-800 dark:text-slate-200">Yükleniyor...</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass rounded-xl p-4 transition-transform hover:-translate-y-1">
+            <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-700 dark:text-slate-200">autovacuum_vacuum_scale_factor</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Default 0.2 (20% of rows) is too high for very large tables. Set to 0.01 or 0.05 for tables with millions of rows to clean them more frequently.</p>
+                    <code id="conf_autovacuum_vacuum_scale_factor" class="text-[10px] bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-transparent px-2 py-1 rounded mt-2 inline-block font-mono tracking-wide text-slate-800 dark:text-slate-200">Yükleniyor...</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass rounded-xl p-4 transition-transform hover:-translate-y-1">
+            <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-700 dark:text-slate-200">checkpoint_completion_target</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Controls write spread across checkpoint interval. Default 0.9 is highly recommended to avoid I/O spikes. Pair with higher wal_buffers.</p>
+                    <code id="conf_checkpoint_completion_target" class="text-[10px] bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-transparent px-2 py-1 rounded mt-2 inline-block font-mono tracking-wide text-slate-800 dark:text-slate-200">Yükleniyor...</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass rounded-xl p-4 transition-transform hover:-translate-y-1">
+            <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-700 dark:text-slate-200">log_min_duration_statement</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Logs the duration of any query running longer than this limit (in ms). Essential for observability and capturing slow queries in logs.</p>
+                    <code id="conf_log_min_duration_statement" class="text-[10px] bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-transparent px-2 py-1 rounded mt-2 inline-block font-mono tracking-wide text-slate-800 dark:text-slate-200">Yükleniyor...</code>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass rounded-xl p-4 transition-transform hover:-translate-y-1">
+            <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-slate-700 dark:text-slate-200">max_connections</p>
+                    <p class="text-[10px] text-slate-500 mt-1">Don't set this too high (e.g., above 300) as each connection consumes RAM and OS resources. Always use PgBouncer for connection pooling.</p>
+                    <code id="conf_max_connections" class="text-[10px] bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-transparent px-2 py-1 rounded mt-2 inline-block font-mono tracking-wide text-slate-800 dark:text-slate-200">Yükleniyor...</code>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

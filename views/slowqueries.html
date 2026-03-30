@@ -1,0 +1,20 @@
+<div class="p-4">
+    <div class="flex items-center justify-between mb-3">
+        <div>
+            <h2 class="text-sm font-bold text-slate-800 dark:text-white">Slow Query Analysis</h2>
+            <p class="text-[10px] text-slate-500 mt-0.5">Historical data from pg_stat_statements</p>
+        </div>
+        <input type="text" class="search-input w-44" placeholder="Filter…" oninput="window.filterTable('tbodySlowFull', this.value)">
+    </div>
+    <div class="glass rounded-xl overflow-hidden">
+        <div class="overflow-x-auto max-h-[calc(100vh-200px)]">
+            <table class="data-table w-full">
+                <thead><tr>
+                    <th>Calls</th><th>Mean ms</th><th>Max ms</th>
+                    <th>Total ms</th><th>Rows/call</th><th class="w-full">Query</th>
+                </tr></thead>
+                <tbody id="tbodySlowFull"></tbody>
+            </table>
+        </div>
+    </div>
+</div>

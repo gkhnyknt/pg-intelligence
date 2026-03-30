@@ -1,0 +1,91 @@
+<div class="p-4 max-w-5xl mx-auto">
+    <div class="mb-5 border-b border-slate-200 dark:border-[#1a2540] pb-4">
+        <h2 class="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+            <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            PG Intelligence Dokümantasyonu
+        </h2>
+        <p class="text-xs text-slate-500 mt-1">Uygulamanın bölümleri ve kullanılan analitik algoritmaların rehberi.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <div class="glass rounded-xl p-5">
+            <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2 flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-blue-500"></div> Overview
+            </h3>
+            <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                Sistemin genel sağlık durumunu tek bakışta görebildiğiniz ana paneldir. Sunucu işlemcisi (CPU), RAM ve disk durumu ile birlikte aktif bağlantılar, Buffer Cache Hit oranı ve deadlocks gibi kritik KPI verileri canlı olarak izlenir.
+            </p>
+        </div>
+
+        <div class="glass rounded-xl p-5">
+            <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2 flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-emerald-500"></div> Live Queries & Terminate
+            </h3>
+            <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed mb-2">
+                Veritabanında o an koşan sorguları listeler. <span class="font-bold text-slate-800 dark:text-slate-200">Active</span> ve <span class="font-bold text-slate-800 dark:text-slate-200">Idle in Transaction</span> sorgular detaylıca görülebilir.
+            </p>
+            <ul class="text-[10px] text-slate-500 dark:text-slate-500 list-disc list-inside ml-2 space-y-1">
+                <li>Bir sorguya tıklayarak <strong>Smart EXPLAIN</strong> analizi başlatabilirsiniz.</li>
+                <li>Sunucuyu kitleyen bir sorgu yakalarsanız, Query Details menüsündeki kırmızı <strong class="text-rose-500">Terminate</strong> butonuna basarak işlemi (PID) güvenle sonlandırabilirsiniz.</li>
+            </ul>
+        </div>
+
+        <div class="glass rounded-xl p-5">
+            <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2 flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-amber-500"></div> Slow Queries
+            </h3>
+            <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                <code>pg_stat_statements</code> tablosundan alınan geçmişe dönük verilerle en çok yavaşlayan, en yüksek ortalama çalışma (Mean ms) ve maksimum (Max ms) süresine sahip kronik yavaş sorguları tespit eder. Optimizasyon için birinci hedeftir.
+            </p>
+        </div>
+
+        <div class="glass rounded-xl p-5 border border-indigo-500/30 dark:border-indigo-500/30">
+            <h3 class="text-sm font-bold text-indigo-600 dark:text-indigo-400 mb-2 flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-indigo-500"></div> Missing Index Advisor
+            </h3>
+            <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
+                Uygulamanın sahip olduğu özel ve akıllı analiz motorudur. Bir tablonun bu listede çıkabilmesi için aşağıdaki 3 katı kuralın tamamını ihlal etmesi gerekir:
+            </p>
+            <div class="bg-slate-50 dark:bg-[#060a12] p-3 rounded-lg border border-slate-200 dark:border-[#1a2540] text-[10px] font-mono text-slate-600 dark:text-slate-400 space-y-2">
+                <p>1. <span class="text-rose-500 font-bold">seq_scan > 50</span>: Tablo baştan sona en az 50 defa kaba kuvvetle taranmış olmalı.</p>
+                <p>2. <span class="text-rose-500 font-bold">seq_tup_read > 50,000</span>: Bu taramalarda en az 50 bin satır gereksiz yere okunmuş olmalı.</p>
+                <p>3. <span class="text-rose-500 font-bold">seq_tup_read > idx_tup_fetch</span>: Kaba kuvvetle okunan satırlar, akıllı (indeksle) okunan satırlardan daha fazla olmalı.</p>
+            </div>
+            <p class="text-[10px] mt-2 text-slate-500">Bu algoritmalar önemsiz tabloları filtreler, sadece sunucunuzun CPU'sunu boğan gerçek eksik indeksleri yakalar.</p>
+        </div>
+
+        <div class="glass rounded-xl p-5">
+            <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2 flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-rose-500"></div> Locks (Kilitler)
+            </h3>
+            <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                Bir tablo veya satır üzerinde çakışan (birbirini bekleyen) işlemleri gösterir. Sistem kırmızı renkte alarm verdiğinde bu sayfaya girip işlemi bloklayan (Blocking PID) sorguyu tespit edip Terminate aracıyla çözebilirsiniz.
+            </p>
+        </div>
+
+        <div class="glass rounded-xl p-5">
+            <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2 flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-teal-500"></div> Vacuum & Bloat
+            </h3>
+            <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed mb-2">
+                PostgreSQL'de silinen veya güncellenen kayıtlar anında diskten silinmez (Dead Tuples). Bu sekme, ölü satırların canlı satırlara olan "Şişkinlik Oranını (Bloat %)" hesaplar.
+            </p>
+            <ul class="text-[10px] text-slate-500 list-disc list-inside ml-2">
+                <li><span class="text-emerald-500 font-bold">%0 - 5</span>: Sağlıklı</li>
+                <li><span class="text-amber-500 font-bold">%5 - 15</span>: Vacuum önerilir (Sarı uyarı)</li>
+                <li><span class="text-rose-500 font-bold">%15+</span>: Bloated / Ciddi performans kaybı</li>
+            </ul>
+        </div>
+
+        <div class="glass rounded-xl p-5 md:col-span-2">
+            <h3 class="text-sm font-bold text-slate-700 dark:text-slate-200 mb-2 flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-fuchsia-500"></div> Config Check
+            </h3>
+            <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                Seçili veritabanı sunucusunun anlık <code class="text-emerald-500">pg_settings</code> değerlerini alarak, modern bir PostgreSQL sunucusunun olması gerektiği değerlerle karşılaştırmanızı sağlayan yapılandırma tavsiyeleri paneli. (Örn: <code>shared_buffers</code>, <code>work_mem</code> vs.)
+            </p>
+        </div>
+
+    </div>
+</div>

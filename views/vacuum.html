@@ -1,0 +1,18 @@
+<div class="p-4">
+    <div class="mb-3">
+        <h2 class="text-sm font-bold text-slate-800 dark:text-white">Vacuum & Bloat Analysis</h2>
+        <p class="text-[10px] text-slate-500 mt-0.5">Tables sorted by dead tuple ratio — candidates for manual VACUUM</p>
+    </div>
+    <div class="glass rounded-xl overflow-hidden">
+        <div class="overflow-x-auto max-h-[calc(100vh-200px)]">
+            <table class="data-table w-full">
+                <thead><tr>
+                    <th>Table</th><th>Live Rows</th><th>Dead Tuples</th>
+                    <th>Bloat %</th><th style="min-width:120px">Bloat Bar</th>
+                    <th>Last Autovacuum</th><th>Action</th>
+                </tr></thead>
+                <tbody id="tbodyVacuum"></tbody>
+            </table>
+        </div>
+    </div>
+</div>

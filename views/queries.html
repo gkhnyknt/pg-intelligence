@@ -1,0 +1,27 @@
+<div class="p-4">
+    <div class="flex items-center justify-between mb-3">
+        <div>
+            <h2 class="text-sm font-bold text-slate-800 dark:text-white">Live Queries</h2>
+            <p class="text-[10px] text-slate-500 mt-0.5">Last 5 minutes — auto-refreshing</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <input type="text" id="querySearch" class="search-input w-40" placeholder="Filter queries…" oninput="window.filterTable('tbodyQueries', this.value)">
+            <div class="flex gap-1">
+                <button onclick="window.setQueryFilter('all')" id="qfAll" class="tab-btn active">All</button>
+                <button onclick="window.setQueryFilter('active')" id="qfActive" class="tab-btn">Active</button>
+                <button onclick="window.setQueryFilter('locked')" id="qfLocked" class="tab-btn">Locked</button>
+            </div>
+        </div>
+    </div>
+    <div class="glass rounded-xl overflow-hidden">
+        <div class="overflow-x-auto max-h-[calc(100vh-200px)]">
+            <table class="data-table w-full">
+                <thead><tr>
+                    <th>Time</th><th>PID</th><th>User</th>
+                    <th>State</th><th>Duration</th><th>Wait</th><th class="w-full">Query</th>
+                </tr></thead>
+                <tbody id="tbodyQueries"></tbody>
+            </table>
+        </div>
+    </div>
+</div>

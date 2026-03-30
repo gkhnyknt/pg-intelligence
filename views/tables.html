@@ -1,0 +1,21 @@
+<div class="p-4">
+    <div class="flex items-center justify-between mb-3">
+        <div>
+            <h2 class="text-sm font-bold text-slate-800 dark:text-white">Table Statistics</h2>
+            <p class="text-[10px] text-slate-500 mt-0.5">Click any table for schema details</p>
+        </div>
+        <input type="text" class="search-input w-44" placeholder="Filter tables…" oninput="window.filterTable('tbodyAllTables', this.value)">
+    </div>
+    <div class="glass rounded-xl overflow-hidden">
+        <div class="overflow-x-auto max-h-[calc(100vh-200px)]">
+            <table class="data-table w-full">
+                <thead><tr>
+                    <th>Schema</th><th>Table</th><th>Size</th><th>Rows</th>
+                    <th>Dead Tuples</th><th>Seq Scans</th><th>Idx Scans</th>
+                    <th>Last Vacuum</th><th>Health</th>
+                </tr></thead>
+                <tbody id="tbodyAllTables"></tbody>
+            </table>
+        </div>
+    </div>
+</div>

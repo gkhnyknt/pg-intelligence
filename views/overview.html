@@ -1,0 +1,143 @@
+<div class="p-4 space-y-4">
+    <div class="grid grid-cols-3 gap-3">
+        <div class="glass rounded-xl p-3.5">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878]">CPU Usage</p>
+                    <p id="osCpuText" class="font-mono text-2xl font-bold text-slate-800 dark:text-white mt-0.5">0%</p>
+                </div>
+                <div class="relative w-10 h-10">
+                    <svg viewBox="0 0 40 40" class="w-10 h-10 -rotate-90">
+                        <circle cx="20" cy="20" r="16" fill="none" stroke="rgba(51,103,145,0.15)" stroke-width="3"/>
+                        <circle id="cpuGauge" cx="20" cy="20" r="16" fill="none" stroke="#336791" stroke-width="3"
+                            stroke-dasharray="0 100.5" stroke-linecap="round" class="gauge-ring"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="progress-bar"><div id="osCpuBar" class="progress-fill bg-blue-500" style="width:0%"></div></div>
+        </div>
+        <div class="glass rounded-xl p-3.5">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878]">RAM Usage</p>
+                    <p id="osRamText" class="font-mono text-2xl font-bold text-slate-800 dark:text-white mt-0.5">0%</p>
+                </div>
+                <div class="relative w-10 h-10">
+                    <svg viewBox="0 0 40 40" class="w-10 h-10 -rotate-90">
+                        <circle cx="20" cy="20" r="16" fill="none" stroke="rgba(99,102,241,0.15)" stroke-width="3"/>
+                        <circle id="ramGauge" cx="20" cy="20" r="16" fill="none" stroke="#6366f1" stroke-width="3"
+                            stroke-dasharray="0 100.5" stroke-linecap="round" class="gauge-ring"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="progress-bar"><div id="osRamBar" class="progress-fill bg-indigo-500" style="width:0%"></div></div>
+        </div>
+        <div class="glass rounded-xl p-3.5">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878]">Disk I/O</p>
+                    <p id="osDiskText" class="font-mono text-2xl font-bold text-slate-800 dark:text-white mt-0.5">0%</p>
+                </div>
+                <div class="relative w-10 h-10">
+                    <svg viewBox="0 0 40 40" class="w-10 h-10 -rotate-90">
+                        <circle cx="20" cy="20" r="16" fill="none" stroke="rgba(16,185,129,0.15)" stroke-width="3"/>
+                        <circle id="diskGauge" cx="20" cy="20" r="16" fill="none" stroke="#10b981" stroke-width="3"
+                            stroke-dasharray="0 100.5" stroke-linecap="round" class="gauge-ring"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="progress-bar"><div id="osDiskBar" class="progress-fill bg-emerald-500" style="width:0%"></div></div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="kpi-card glass border-l-2 border-blue-500">
+            <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878] mb-1">Connections</p>
+            <p id="kpiConns" class="font-mono text-3xl font-bold text-slate-800 dark:text-white count-up">0</p>
+            <p class="text-[9px] text-slate-400 mt-1">Active sessions</p>
+        </div>
+        <div class="kpi-card glass border-l-2 border-emerald-500">
+            <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878] mb-1">Cache Hit</p>
+            <p id="kpiCache" class="font-mono text-3xl font-bold text-emerald-500 count-up">0%</p>
+            <p class="text-[9px] text-slate-400 mt-1">Buffer hit ratio</p>
+        </div>
+        <div class="kpi-card glass border-l-2 border-rose-500">
+            <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878] mb-1">Locks</p>
+            <p id="kpiLocks" class="font-mono text-3xl font-bold text-rose-500 count-up">0</p>
+            <p class="text-[9px] text-slate-400 mt-1">Blocked queries</p>
+        </div>
+        <div class="kpi-card glass border-l-2 border-[#336791]">
+            <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878] mb-1">DB Size</p>
+            <p id="kpiSize" class="font-mono text-3xl font-bold text-[#6cb4ee] count-up">0 GB</p>
+            <p class="text-[9px] text-slate-400 mt-1">Total disk usage</p>
+        </div>
+    </div>
+
+    <div class="glass rounded-xl p-3">
+        <div class="flex items-center justify-between mb-2.5">
+            <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878]">Diagnostics</p>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <div class="flex justify-between items-center bg-slate-50 dark:bg-[#0d1424] rounded-lg px-3 py-2 border border-slate-200 dark:border-[#1a2540]">
+                <span class="text-[10px] font-semibold text-slate-600 dark:text-slate-400">Index Hit</span>
+                <span id="kpiIndexHit" class="font-mono text-xs font-bold text-emerald-500">0%</span>
+            </div>
+            <div class="flex justify-between items-center bg-slate-50 dark:bg-[#0d1424] rounded-lg px-3 py-2 border border-slate-200 dark:border-[#1a2540]">
+                <span class="text-[10px] font-semibold text-slate-600 dark:text-slate-400">Rollbacks</span>
+                <span id="kpiRollbacks" class="font-mono text-xs font-bold">0%</span>
+            </div>
+            <div class="flex justify-between items-center bg-slate-50 dark:bg-[#0d1424] rounded-lg px-3 py-2 border border-slate-200 dark:border-[#1a2540]">
+                <span class="text-[10px] font-semibold text-slate-600 dark:text-slate-400">Deadlocks</span>
+                <span id="kpiDeadlocks" class="font-mono text-xs font-bold">0</span>
+            </div>
+            <div class="flex justify-between items-center bg-slate-50 dark:bg-[#0d1424] rounded-lg px-3 py-2 border border-slate-200 dark:border-[#1a2540]">
+                <span class="text-[10px] font-semibold text-slate-600 dark:text-slate-400">Temp Files</span>
+                <span id="kpiTempFiles" class="font-mono text-xs font-bold">0</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
+        <div class="glass rounded-xl p-3.5">
+            <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878] mb-3">Query States</p>
+            <div class="chart-wrap"><canvas id="chartStates"></canvas></div>
+        </div>
+        <div class="glass rounded-xl p-3.5">
+            <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878] mb-3">Top Tables by Size</p>
+            <div class="chart-wrap"><canvas id="chartTables"></canvas></div>
+        </div>
+        <div class="glass rounded-xl p-3.5">
+            <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878] mb-3">Transactions / sec</p>
+            <div class="chart-wrap"><canvas id="chartTps"></canvas></div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-3">
+        <div class="glass rounded-xl overflow-hidden">
+            <div class="px-3 py-2.5 border-b border-[#1a2540] flex items-center justify-between">
+                <p class="text-[9px] font-bold uppercase tracking-widest text-amber-500">⚡ Top Slow Queries</p>
+                <button onclick="window.showPage('slowqueries')" class="text-[9px] text-slate-500 hover:text-slate-300 transition-colors">View all →</button>
+            </div>
+            <div class="overflow-x-auto max-h-48">
+                <table class="data-table w-full">
+                    <thead><tr>
+                        <th>Calls</th><th>Mean</th><th>Max</th><th class="w-full">Query</th>
+                    </tr></thead>
+                    <tbody id="tbodySlowQueries"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="glass rounded-xl overflow-hidden">
+            <div class="px-3 py-2.5 border-b border-[#1a2540] flex items-center justify-between">
+                <p class="text-[9px] font-bold uppercase tracking-widest text-rose-500">🗑 Bloat Alert</p>
+                <button onclick="window.showPage('vacuum')" class="text-[9px] text-slate-500 hover:text-slate-300 transition-colors">View all →</button>
+            </div>
+            <div class="overflow-x-auto max-h-48">
+                <table class="data-table w-full">
+                    <thead><tr><th>Table</th><th>Dead Tuples</th><th>Bloat %</th><th>Status</th></tr></thead>
+                    <tbody id="tbodyBloatMini"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PG Intelligence — Database Control Center</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link href="css/style.css" rel="stylesheet">
+
+    <script>
+        if (localStorage.getItem('theme') === 'light') document.documentElement.classList.remove('dark');
+        else document.documentElement.classList.add('dark');
+        
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: { fontFamily: { sans: ['Syne', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] } } }
+        }
+    </script>
+</head>
+<body class="dark:bg-[#060a12] bg-slate-100 text-slate-800 dark:text-slate-300 font-sans antialiased flex flex-col h-screen overflow-hidden">
+
+    <div id="loader" class="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#060a12] transition-opacity duration-600">
+        <div class="relative mb-8">
+            <svg class="w-16 h-16 animate-spin" viewBox="0 0 64 64">
+                <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(51,103,145,0.15)" stroke-width="3"/>
+                <circle cx="32" cy="32" r="28" fill="none" stroke="rgba(108,180,238,0.6)" stroke-width="3"
+                    stroke-dasharray="44 132" stroke-linecap="round"/>
+                <circle cx="32" cy="32" r="18" fill="none" stroke="rgba(51,103,145,0.4)" stroke-width="2"
+                    stroke-dasharray="30 84" stroke-linecap="round" class="animate-spin-reverse"/>
+            </svg>
+        </div>
+        <p class="font-mono text-xs text-slate-500 tracking-widest uppercase">Connecting to database…</p>
+    </div>
+
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div class="absolute -top-40 -left-40 w-96 h-96 rounded-full" style="background:radial-gradient(circle, rgba(51,103,145,0.12) 0%, transparent 70%);"></div>
+        <div class="absolute -bottom-40 -right-40 w-96 h-96 rounded-full" style="background:radial-gradient(circle, rgba(239,68,68,0.05) 0%, transparent 70%);"></div>
+    </div>
+
+    <nav class="relative h-12 shrink-0 z-20 flex items-center justify-between px-4 glass dark:glass border-b border-slate-200 dark:border-[#1a2540]">
+        <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center w-7 h-7 rounded-lg" style="background:linear-gradient(135deg,#336791,#1e4d6b);">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/>
+                </svg>
+            </div>
+            <div>
+                <span class="text-sm font-bold text-slate-800 dark:text-white tracking-tight">PG</span>
+                <span class="text-sm font-normal text-slate-500 dark:text-slate-400 ml-1 tracking-tight">Intelligence</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+                <div class="pulse-dot"></div>
+                <span class="font-mono text-[10px] text-slate-500 uppercase tracking-wider">Live Sync</span>
+            </div>
+            <div class="hidden md:flex items-center gap-1.5 bg-slate-100 dark:bg-[#0d1424] border border-slate-200 dark:border-[#1a2540] rounded-md px-2.5 py-1">
+                <div class="w-1.5 h-1.5 rounded-full bg-[#336791]"></div>
+                <span id="topbarDb" class="font-mono text-[10px] text-slate-600 dark:text-slate-400">postgres</span>
+            </div>
+            <div id="alertIndicator" class="hidden relative">
+                <div class="w-6 h-6 flex items-center justify-center rounded-md bg-rose-500/10 border border-rose-500/20">
+                    <svg class="w-3.5 h-3.5 text-rose-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <span id="alertCount" class="alert-badge">0</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-1">
+            <button onclick="window.showPage('help')" class="w-7 h-7 flex items-center justify-center rounded-md text-slate-500 hover:text-indigo-500 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all" title="Yardım ve Dokümantasyon">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </button>
+            <button onclick="window.toggleTheme()" class="w-7 h-7 flex items-center justify-center rounded-md text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all" title="Tema">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+            </button>
+            <button onclick="window.handleLogout()" class="w-7 h-7 flex items-center justify-center rounded-md text-slate-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all" title="Çıkış">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            </button>
+        </div>
+        <div class="topbar-glow"></div>
+    </nav>
+
+    <div class="flex flex-1 overflow-hidden relative z-10">
+
+        <aside class="w-44 shrink-0 flex flex-col glass dark:glass border-r border-slate-200 dark:border-[#1a2540]">
+            <div class="p-2.5 border-b border-slate-200 dark:border-[#1a2540]">
+                <p class="text-[8px] font-bold uppercase tracking-widest text-slate-400 dark:text-[#4a5878] mb-2 px-1">Servers</p>
+                <select id="serverSelect" onchange="window.selectServer(this.value)" class="w-full text-[10px] font-bold bg-white dark:bg-[#0d1424] border border-slate-200 dark:border-[#1a2540] text-slate-700 dark:text-slate-300 rounded-md px-2 py-1.5 outline-none cursor-pointer focus:border-[#336791] transition-colors">
+                    <option value="">Yükleniyor...</option>
+                </select>
+            </div>
+
+            <div class="p-2.5 border-b border-slate-200 dark:border-[#1a2540]">
+                <p class="text-[8px] font-bold uppercase tracking-widest text-slate-400 dark:text-[#4a5878] mb-2 px-1">Databases</p>
+                <div id="dbList" class="space-y-0.5 max-h-40 overflow-y-auto"></div>
+            </div>
+
+            <nav class="flex-1 p-2 space-y-0.5 overflow-y-auto">
+                <p class="text-[8px] font-bold uppercase tracking-widest text-slate-400 dark:text-[#4a5878] mb-2 px-1 mt-1">Navigation</p>
+                <div class="nav-item active" onclick="window.showPage('overview')">
+                    <div class="dot"></div>
+                    <span>Overview</span>
+                </div>
+                <div class="nav-item" onclick="window.showPage('queries')">
+                    <div class="dot"></div>
+                    <span>Live Queries</span>
+                    <span id="navQueryCount" class="ml-auto text-[8px] bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded-full font-mono hidden">0</span>
+                </div>
+                <div class="nav-item" onclick="window.showPage('slowqueries')">
+                    <div class="dot"></div>
+                    <span>Slow Queries</span>
+                </div>
+                <div class="nav-item" onclick="window.showPage('errors')">
+                    <div class="dot text-rose-500"></div>
+                    <span class="text-rose-600 dark:text-rose-400 font-bold">Error Logs</span>
+                </div>
+                
+                <div class="nav-item" onclick="window.showPage('tables')">
+                    <div class="dot"></div>
+                    <span>Tables</span>
+                </div>
+                <div class="nav-item" onclick="window.showPage('missingindexes')">
+                    <div class="dot"></div>
+                    <span>Missing Indexes</span>
+                </div>
+                <div class="nav-item" onclick="window.showPage('locks')">
+                    <div class="dot"></div>
+                    <span>Locks</span>
+                    <span id="navLockCount" class="ml-auto text-[8px] bg-rose-500/20 text-rose-400 px-1.5 py-0.5 rounded-full font-mono hidden">0</span>
+                </div>
+                <div class="nav-item" onclick="window.showPage('vacuum')">
+                    <div class="dot"></div>
+                    <span>Vacuum & Bloat</span>
+                </div>
+                <div class="nav-item" onclick="window.showPage('config')">
+                    <div class="dot"></div>
+                    <span>Config Check</span>
+                </div>
+            </nav>
+
+            <div class="p-2.5 border-t border-slate-200 dark:border-[#1a2540]">
+                <p class="text-[8px] text-slate-400 dark:text-[#4a5878] mb-1.5 font-bold uppercase tracking-wider px-1">Refresh</p>
+                <select id="refreshInterval" onchange="window.changeRefreshInterval()" class="w-full text-[10px] bg-slate-100 dark:bg-[#0d1424] border border-slate-200 dark:border-[#1a2540] text-slate-600 dark:text-slate-400 rounded-md px-2 py-1 outline-none">
+                    <option value="3000">Every 3s</option>
+                    <option value="5000" selected>Every 5s</option>
+                    <option value="10000">Every 10s</option>
+                    <option value="30000">Every 30s</option>
+                    <option value="0">Manual</option>
+                </select>
+            </div>
+        </aside>
+
+        <main id="main-content" class="flex-1 overflow-y-auto relative">
+            </main>
+    </div>
+
+    <div id="errorModal" class="fixed inset-0 z-[120] modal-backdrop hidden flex items-center justify-center p-4">
+        <div class="glass w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] fade-up">
+            <div class="px-5 py-4 border-b border-slate-200 dark:border-[#1a2540] flex justify-between items-center shrink-0">
+                <div class="flex items-center gap-3">
+                    <h3 class="text-sm font-bold text-rose-600 dark:text-rose-400 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                        Error Log Detayları
+                    </h3>
+                </div>
+                <button onclick="closeModal('errorModal')" class="w-7 h-7 flex items-center justify-center rounded-md text-slate-500 hover:text-rose-500 hover:bg-rose-100 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="p-5 overflow-y-auto flex-1 space-y-4">
+                <div class="grid grid-cols-4 gap-2">
+                    <div class="bg-slate-50 dark:bg-[#0d1424] border border-slate-200 dark:border-[#1a2540] rounded-lg px-3 py-2">
+                        <p class="text-[8px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878] mb-1">Zaman</p>
+                        <p id="errModalTime" class="font-mono text-[10px] font-bold text-slate-800 dark:text-white"></p>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-[#0d1424] border border-slate-200 dark:border-[#1a2540] rounded-lg px-3 py-2">
+                        <p class="text-[8px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878] mb-1">Kullanıcı</p>
+                        <p id="errModalUser" class="font-mono text-[10px] font-bold text-slate-800 dark:text-white"></p>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-[#0d1424] border border-slate-200 dark:border-[#1a2540] rounded-lg px-3 py-2">
+                        <p class="text-[8px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878] mb-1">Veritabanı</p>
+                        <p id="errModalDb" class="font-mono text-[10px] font-bold text-slate-800 dark:text-white"></p>
+                    </div>
+                    <div class="bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-lg px-3 py-2">
+                        <p class="text-[8px] font-bold uppercase tracking-widest text-rose-500 dark:text-rose-400 mb-1">Seviye</p>
+                        <p id="errModalSev" class="font-mono text-[10px] font-bold text-rose-600 dark:text-rose-400"></p>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878] mb-2">Hata Mesajı</p>
+                    <div class="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-[#1a2540] rounded-xl p-4 shadow-inner">
+                        <p id="errModalMsg" class="font-mono text-xs text-rose-600 dark:text-rose-400 whitespace-pre-wrap break-words leading-relaxed"></p>
+                    </div>
+                </div>
+
+                <div>
+                    <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878] mb-2">Hatalı Sorgu (Eğer Varsa)</p>
+                    <div class="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-[#1a2540] rounded-xl p-4 overflow-x-auto shadow-inner">
+                        <pre id="errModalQuery" class="font-mono text-xs text-slate-700 dark:text-blue-300 whitespace-pre-wrap break-all leading-relaxed"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="queryModal" class="fixed inset-0 z-[100] modal-backdrop hidden flex items-center justify-center p-4">
+        <div class="glass w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] fade-up">
+            <div class="px-5 py-4 border-b border-slate-200 dark:border-[#1a2540] flex justify-between items-center shrink-0">
+                <div class="flex items-center gap-3">
+                    <h3 class="text-sm font-bold text-slate-800 dark:text-white">Query Details</h3>
+                    <span id="modalPid" class="font-mono text-[10px] bg-blue-100 dark:bg-[#336791]/20 text-blue-600 dark:text-[#6cb4ee] border border-blue-200 dark:border-[#336791]/30 px-2 py-0.5 rounded-md"></span>
+                </div>
+                <button onclick="closeModal('queryModal')" class="w-7 h-7 flex items-center justify-center rounded-md text-slate-500 hover:text-rose-500 hover:bg-rose-100 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="p-5 overflow-y-auto flex-1 space-y-4">
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="bg-slate-50 dark:bg-[#0d1424] border border-slate-200 dark:border-[#1a2540] rounded-lg px-3 py-2">
+                        <p class="text-[8px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878] mb-1">User</p>
+                        <p id="modalUser" class="font-mono text-xs font-bold text-slate-800 dark:text-white"></p>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-[#0d1424] border border-slate-200 dark:border-[#1a2540] rounded-lg px-3 py-2">
+                        <p class="text-[8px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878] mb-1">Duration</p>
+                        <p id="modalDur" class="font-mono text-xs font-bold text-amber-600 dark:text-amber-400"></p>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-[#0d1424] border border-slate-200 dark:border-[#1a2540] rounded-lg px-3 py-2">
+                        <p class="text-[8px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878] mb-1">State</p>
+                        <p id="modalState" class="font-mono text-xs font-bold text-slate-800 dark:text-white"></p>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878]">SQL Statement</p>
+                        <div class="flex gap-2">
+                            <button id="killQueryBtn" onclick="window.killQuery()" class="hidden flex items-center gap-1 text-[9px] bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20 px-2 py-1.5 rounded-md hover:bg-rose-600 hover:text-white transition-all font-bold">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                                Terminate
+                            </button>
+
+                            <button onclick="window.copySql()" class="text-[9px] text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2 2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                Copy
+                            </button>
+                            <button id="explainBtn" onclick="window.runExplain()" class="flex items-center gap-1.5 text-[9px] bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20 px-2.5 py-1.5 rounded-md hover:bg-indigo-600 hover:text-white transition-all font-bold">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                Smart Analyze
+                            </button>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-[#1a2540] rounded-xl p-4 overflow-x-auto shadow-inner">
+                        <pre id="modalSql" class="font-mono text-xs text-slate-700 dark:text-blue-300 whitespace-pre-wrap break-all leading-relaxed"></pre>
+                    </div>
+                </div>
+
+                <div id="explainContainer" class="hidden space-y-3">
+                    <div id="smartAnalysisContainer"></div>
+                    <details class="bg-slate-50 dark:bg-[#060a12] border border-slate-200 dark:border-[#1a2540] rounded-xl">
+                        <summary class="cursor-pointer p-3 text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878] hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors outline-none">
+                            Raw EXPLAIN Output (Expert View)
+                        </summary>
+                        <div class="p-4 border-t border-slate-200 dark:border-[#1a2540]">
+                            <pre id="explainText" class="font-mono text-[10px] text-emerald-700 dark:text-emerald-400 whitespace-pre-wrap break-words leading-relaxed"></pre>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tableDetailModal" class="fixed inset-0 z-[110] modal-backdrop hidden flex items-center justify-center p-4">
+        <div class="glass w-full max-w-4xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] fade-up">
+            <div class="px-5 py-4 border-b border-slate-200 dark:border-[#1a2540] flex justify-between items-center shrink-0">
+                <h3 class="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    <svg class="w-4 h-4 text-blue-600 dark:text-[#6cb4ee]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                    <span id="detailTableName" class="text-blue-600 dark:text-[#6cb4ee] font-mono"></span>
+                </h3>
+                <button onclick="closeModal('tableDetailModal')" class="w-7 h-7 flex items-center justify-center rounded-md text-slate-500 hover:text-rose-500 hover:bg-rose-100 dark:hover:text-rose-400 dark:hover:bg-rose-500/10 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="p-5 overflow-y-auto flex-1 space-y-5">
+                <div>
+                    <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878] mb-2">Columns</p>
+                    <div class="bg-white dark:bg-[#060a12] border border-slate-200 dark:border-[#1a2540] rounded-xl overflow-hidden">
+                        <table class="data-table w-full">
+                            <thead><tr>
+                                <th>Column</th><th>Data Type</th><th>Max Length</th><th>Nullable</th><th>Default</th>
+                            </tr></thead>
+                            <tbody id="tbodyTableColumns"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-[9px] font-bold uppercase tracking-widest text-slate-500 dark:text-[#4a5878] mb-2">Indexes</p>
+                    <div class="bg-white dark:bg-[#060a12] border border-slate-200 dark:border-[#1a2540] rounded-xl overflow-hidden">
+                        <table class="data-table w-full">
+                            <thead><tr><th>Index Name</th><th class="w-full">Definition</th></tr></thead>
+                            <tbody id="tbodyTableIndexes"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-[1000] flex flex-col-reverse gap-2"></div>
+
+    <script type="module" src="js/main.js"></script>
+
+</body>
+</html>
