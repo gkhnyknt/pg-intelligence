@@ -87,9 +87,9 @@
             document.getElementById('submitBtn').disabled = true;
             errorBox.classList.add('hidden');
 
-            // Şifreler Base64 formatında tutuluyor
+// Şifreler Base64 formatında tutuluyor
             const expectedUser = 'YWRtaW4=';         // "admin"
-            const expectedPass = 'UGlyaSExOTIzLiw='; // "Piri!1923.,"
+            const expectedPass = 'MTIzNDU2';         // "123456"
 
             setTimeout(() => {
                 if (btoa(userStr) === expectedUser && btoa(passStr) === expectedPass) {
