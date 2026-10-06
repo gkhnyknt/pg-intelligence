@@ -1,6 +1,7 @@
 import { checkAuth } from './auth.js';
 import { fetchMonitoringData, fetchConfigData, fetchServersApi, fetchLogFilesApi, fetchLogContentApi } from './api.js';
 import { hideLoader, checkAlerts, setActiveDb, setActiveServer, initCharts, updateCharts, initUI } from './ui.js';
+import { escapeHtml as esc, jsArg } from './utils.js';
 
 checkAuth();
 
@@ -67,12 +68,12 @@ window.loadLogFiles = async () => {
                 selectEl.innerHTML = '<option value="">Son 30 güne ait CSV log bulunamadı</option>';
                 setHtml('tbodyErrorLogs', '<tr><td colspan="6" class="text-center py-8 text-slate-500 text-xs">Log klasöründe dosya yok.</td></tr>');
             } else {
-                selectEl.innerHTML = data.files.map(f => `<option value="${f.filename}">${f.filename} (${f.mtime})</option>`).join('');
+                selectEl.innerHTML = data.files.map(f => `<option value="${esc(f.filename)}">${esc(f.filename)} (${esc(f.mtime)})</option>`).join('');
                 window.loadLogContent(data.files[0].filename);
             }
         } else {
             selectEl.innerHTML = `<option value="">Hata: Bulunamadı</option>`;
-            setHtml('tbodyErrorLogs', `<tr><td colspan="6" class="text-center py-8 text-rose-500 text-xs">${data.message}</td></tr>`);
+            setHtml('tbodyErrorLogs', `<tr><td colspan="6" class="text-center py-8 text-rose-500 text-xs">${esc(data.message)}</td></tr>`);
         }
     } catch (e) {
         selectEl.innerHTML = '<option value="">Bağlantı Hatası</option>';
@@ -102,18 +103,18 @@ window.loadLogContent = async (filename, isSilent = false) => {
                     const b64Query = btoa(encodeURIComponent(err.query || ''));
                     
                     return `
-                    <tr onclick="window.openErrorModal('${err.time}', '${err.user}', '${err.db}', '${err.severity}', '${b64Msg}', '${b64Query}')">
-                        <td class="font-mono text-[10px] text-slate-500 dark:text-slate-400">${err.time}</td>
-                        <td class="font-mono text-[10px] ${sevColor}">${err.severity}</td>
-                        <td class="font-mono text-[10px] text-blue-600 dark:text-[#6cb4ee]">${err.user}</td>
-                        <td class="font-mono text-[10px] text-slate-600 dark:text-slate-300">${err.db}</td>
-                        <td class="font-mono text-[10px] text-slate-600 dark:text-slate-400 max-w-[300px] truncate">${shortMsg}</td>
+                    <tr onclick="window.openErrorModal(${jsArg(err.time)}, ${jsArg(err.user)}, ${jsArg(err.db)}, ${jsArg(err.severity)}, '${b64Msg}', '${b64Query}')">
+                        <td class="font-mono text-[10px] text-slate-500 dark:text-slate-400">${esc(err.time)}</td>
+                        <td class="font-mono text-[10px] ${sevColor}">${esc(err.severity)}</td>
+                        <td class="font-mono text-[10px] text-blue-600 dark:text-[#6cb4ee]">${esc(err.user)}</td>
+                        <td class="font-mono text-[10px] text-slate-600 dark:text-slate-300">${esc(err.db)}</td>
+                        <td class="font-mono text-[10px] text-slate-600 dark:text-slate-400 max-w-[300px] truncate">${esc(shortMsg)}</td>
                         <td class="text-center"><button class="text-[9px] bg-slate-100 dark:bg-slate-800 text-slate-500 px-2 py-1 rounded">Detay</button></td>
                     </tr>`;
                 }).join(''));
             }
         } else {
-            if(!isSilent) setHtml('tbodyErrorLogs', `<tr><td colspan="6" class="text-center py-8 text-rose-500 text-xs">${data.message}</td></tr>`);
+            if(!isSilent) setHtml('tbodyErrorLogs', `<tr><td colspan="6" class="text-center py-8 text-rose-500 text-xs">${esc(data.message)}</td></tr>`);
         }
     } catch (e) {
         if(!isSilent) setHtml('tbodyErrorLogs', '<tr><td colspan="6" class="text-center py-8 text-rose-500 text-xs">Log içeriği alınamadı veya çok büyük.</td></tr>');
@@ -175,9 +176,9 @@ async function loadDashboard() {
 
     // ── 4. DB List ────────────────────────────────────────────────
     const dbHtml = (data.databases || []).map(db => `
-        <button onclick="window.selectDatabase('${db}')"
+        <button onclick="window.selectDatabase(${jsArg(db)})"
             class="db-btn ${db === data.current_db ? 'active' : ''}">
-            ${db}
+            ${esc(db)}
         </button>
     `).join('');
     setHtml('dbList', dbHtml);
@@ -221,13 +222,13 @@ async function loadDashboard() {
             tr.dataset.dur   = q.duration_sec + 's';
             tr.dataset.locked = isLocked ? 'true' : 'false';
             tr.innerHTML = `
-                <td class="font-mono text-[10px] text-slate-500 dark:text-slate-400">${q.start_time || '—'}</td>
-                <td class="font-mono text-[10px] text-blue-600 dark:text-[#6cb4ee] font-bold">${q.pid}</td>
-                <td class="font-mono text-[10px] text-slate-700 dark:text-slate-200">${q.user}</td>
-                <td class="font-mono text-[10px] ${stateColor}">${q.state || '—'}</td>
-                <td class="font-mono text-[10px] text-amber-600 dark:text-amber-400">${q.duration_sec}s</td>
+                <td class="font-mono text-[10px] text-slate-500 dark:text-slate-400">${esc(q.start_time || '—')}</td>
+                <td class="font-mono text-[10px] text-blue-600 dark:text-[#6cb4ee] font-bold">${esc(q.pid)}</td>
+                <td class="font-mono text-[10px] text-slate-700 dark:text-slate-200">${esc(q.user)}</td>
+                <td class="font-mono text-[10px] ${stateColor}">${esc(q.state || '—')}</td>
+                <td class="font-mono text-[10px] text-amber-600 dark:text-amber-400">${esc(q.duration_sec)}s</td>
                 <td class="font-mono text-[10px] ${isLocked ? 'text-rose-600 dark:text-rose-400' : 'text-slate-500 dark:text-slate-500'}">${isLocked ? '🔒 Lock' : '—'}</td>
-                <td class="font-mono text-[10px] text-slate-600 dark:text-slate-400 truncate max-w-[240px]">${shortQ}</td>
+                <td class="font-mono text-[10px] text-slate-600 dark:text-slate-400 truncate max-w-[240px]">${esc(shortQ)}</td>
             `;
             tr.onclick = () => window.openModal(q.pid, q.user, q.state, q.duration_sec + 's', b64);
             qRows.push(tr);
@@ -243,11 +244,11 @@ async function loadDashboard() {
             const shortQ = (sq.query || '').length > 50 ? sq.query.substring(0, 50) + '…' : sq.query;
             const b64 = btoa(encodeURIComponent(sq.query || ''));
             return `
-            <tr onclick="window.openModal('Historical','App','Slow Query','${sq.calls} calls','${b64}')">
+            <tr onclick="window.openModal('Historical','App','Slow Query',${jsArg(sq.calls + ' calls')},'${b64}')">
                 <td class="font-mono text-[10px] text-slate-600 dark:text-slate-400">${fmtNum(sq.calls)}</td>
-                <td class="font-mono text-[10px] text-amber-600 dark:text-amber-400 font-bold">${sq.mean_time_ms} ms</td>
-                <td class="font-mono text-[10px] text-rose-600 dark:text-rose-400">${sq.max_time_ms} ms</td>
-                <td class="font-mono text-[10px] text-slate-600 dark:text-slate-500 truncate max-w-[200px]">${shortQ}</td>
+                <td class="font-mono text-[10px] text-amber-600 dark:text-amber-400 font-bold">${esc(sq.mean_time_ms)} ms</td>
+                <td class="font-mono text-[10px] text-rose-600 dark:text-rose-400">${esc(sq.max_time_ms)} ms</td>
+                <td class="font-mono text-[10px] text-slate-600 dark:text-slate-500 truncate max-w-[200px]">${esc(shortQ)}</td>
             </tr>`;
         }).join('');
     setHtml('tbodySlowQueries', slowHtml);
@@ -260,13 +261,13 @@ async function loadDashboard() {
             const totalMs = ((sq.mean_time_ms || 0) * (sq.calls || 1)).toFixed(0);
             const rowsPerCall = sq.rows ? (sq.rows / sq.calls).toFixed(1) : '—';
             return `
-            <tr onclick="window.openModal('Historical','App','Slow Query','${sq.calls} calls','${b64}')">
+            <tr onclick="window.openModal('Historical','App','Slow Query',${jsArg(sq.calls + ' calls')},'${b64}')">
                 <td class="font-mono text-[10px] text-slate-600 dark:text-slate-400 font-bold">${fmtNum(sq.calls)}</td>
-                <td class="font-mono text-[10px] text-amber-600 dark:text-amber-400 font-bold">${sq.mean_time_ms} ms</td>
-                <td class="font-mono text-[10px] text-rose-600 dark:text-rose-400">${sq.max_time_ms} ms</td>
+                <td class="font-mono text-[10px] text-amber-600 dark:text-amber-400 font-bold">${esc(sq.mean_time_ms)} ms</td>
+                <td class="font-mono text-[10px] text-rose-600 dark:text-rose-400">${esc(sq.max_time_ms)} ms</td>
                 <td class="font-mono text-[10px] text-slate-600 dark:text-slate-500">${fmtNum(totalMs)} ms</td>
                 <td class="font-mono text-[10px] text-slate-600 dark:text-slate-500">${rowsPerCall}</td>
-                <td class="font-mono text-[10px] text-slate-600 dark:text-slate-400 max-w-[280px] truncate">${shortQ}</td>
+                <td class="font-mono text-[10px] text-slate-600 dark:text-slate-400 max-w-[280px] truncate">${esc(shortQ)}</td>
             </tr>`;
         }).join('');
     setHtml('tbodySlowFull', slowFullHtml);
@@ -276,15 +277,15 @@ async function loadDashboard() {
         const sizeStr = fmtBytes(t.size_bytes);
         const bloatRatio = t.rows > 0 ? (t.dead / t.rows) * 100 : 0;
         return `
-        <tr onclick="window.fetchTableDetails('${t.db_name}','${t.schema_name}','${t.name}')">
-            <td class="font-mono text-[10px] text-blue-600 dark:text-blue-400">${t.schema_name || 'public'}</td>
-            <td class="font-mono text-[10px] text-blue-600 dark:text-[#6cb4ee] font-bold">${t.name}</td>
+        <tr onclick="window.fetchTableDetails(${jsArg(t.db_name)},${jsArg(t.schema_name)},${jsArg(t.name)})">
+            <td class="font-mono text-[10px] text-blue-600 dark:text-blue-400">${esc(t.schema_name || 'public')}</td>
+            <td class="font-mono text-[10px] text-blue-600 dark:text-[#6cb4ee] font-bold">${esc(t.name)}</td>
             <td class="font-mono text-[10px] text-slate-600 dark:text-slate-300">${sizeStr}</td>
             <td class="font-mono text-[10px] text-slate-600 dark:text-slate-400">${fmtNum(t.rows)}</td>
             <td class="font-mono text-[10px] ${t.dead > 1000 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500 dark:text-slate-500'}">${fmtNum(t.dead)}</td>
             <td class="font-mono text-[10px] text-rose-600 dark:text-rose-400">${fmtNum(t.seq_scan)}</td>
             <td class="font-mono text-[10px] text-emerald-600 dark:text-emerald-400">${fmtNum(t.idx_scan)}</td>
-            <td class="font-mono text-[10px] text-slate-500">${t.last_autovacuum || 'Never'}</td>
+            <td class="font-mono text-[10px] text-slate-500">${esc(t.last_autovacuum || 'Never')}</td>
             <td>${healthBadge(bloatRatio)}</td>
         </tr>`;
     }).join('');
@@ -304,13 +305,13 @@ async function loadDashboard() {
             setHtml('tbodyLocks', lockedRows.map(q => {
                 const b64 = btoa(encodeURIComponent(q.query || ''));
                 return `
-                <tr class="row-locked" onclick="window.openModal('${q.pid}','${q.user}','${q.state}','${q.duration_sec}s','${b64}')">
-                    <td class="font-mono text-[10px] text-rose-600 dark:text-rose-400 font-bold">${q.pid}</td>
-                    <td class="font-mono text-[10px] text-slate-600 dark:text-slate-300">${q.user}</td>
-                    <td class="font-mono text-[10px] text-amber-600 dark:text-amber-400">${q.duration_sec}s</td>
+                <tr class="row-locked" onclick="window.openModal(${jsArg(q.pid)},${jsArg(q.user)},${jsArg(q.state)},${jsArg(q.duration_sec + 's')},'${b64}')">
+                    <td class="font-mono text-[10px] text-rose-600 dark:text-rose-400 font-bold">${esc(q.pid)}</td>
+                    <td class="font-mono text-[10px] text-slate-600 dark:text-slate-300">${esc(q.user)}</td>
+                    <td class="font-mono text-[10px] text-amber-600 dark:text-amber-400">${esc(q.duration_sec)}s</td>
                     <td class="font-mono text-[10px] text-slate-500 dark:text-slate-400">—</td>
                     <td class="font-mono text-[10px] text-rose-600 dark:text-rose-400">Lock</td>
-                    <td class="font-mono text-[10px] text-slate-500 dark:text-slate-500 truncate max-w-[220px]">${(q.query||'').substring(0,60)}…</td>
+                    <td class="font-mono text-[10px] text-slate-500 dark:text-slate-500 truncate max-w-[220px]">${esc((q.query||'').substring(0,60))}…</td>
                 </tr>`;
             }).join(''));
         }
@@ -328,7 +329,7 @@ async function loadDashboard() {
         const vacuumCmd = `VACUUM ANALYZE ${t.schema_name}.${t.name};`;
         return `
         <tr>
-            <td class="font-mono text-[10px] text-blue-600 dark:text-[#6cb4ee] font-bold">${t.name}</td>
+            <td class="font-mono text-[10px] text-blue-600 dark:text-[#6cb4ee] font-bold">${esc(t.name)}</td>
             <td class="font-mono text-[10px] text-slate-600 dark:text-slate-400">${fmtNum(t.rows)}</td>
             <td class="font-mono text-[10px] ${bloatRatio > 5 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500'}">${fmtNum(t.dead)}</td>
             <td class="font-mono text-[10px] ${bloatRatio > 15 ? 'text-rose-600 dark:text-rose-400 font-bold' : bloatRatio > 5 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}">${bloatRatio.toFixed(1)}%</td>
@@ -337,9 +338,9 @@ async function loadDashboard() {
                     <div class="${barColor} vacuum-bar progress-fill" style="width:${Math.min(bloatRatio, 100)}%"></div>
                 </div>
             </td>
-            <td class="font-mono text-[10px] text-slate-500">${t.last_autovacuum || 'Never'}</td>
+            <td class="font-mono text-[10px] text-slate-500">${esc(t.last_autovacuum || 'Never')}</td>
             <td>
-                ${bloatRatio > 5 ? `<button onclick="navigator.clipboard.writeText('${vacuumCmd}')" class="text-[8px] bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded hover:bg-amber-500 hover:text-white transition-all font-bold">COPY VACUUM</button>` : '—'}
+                ${bloatRatio > 5 ? `<button onclick="navigator.clipboard.writeText(${jsArg(vacuumCmd)})" class="text-[8px] bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded hover:bg-amber-500 hover:text-white transition-all font-bold">COPY VACUUM</button>` : '—'}
             </td>
         </tr>`;
     }).join(''));
@@ -348,7 +349,7 @@ async function loadDashboard() {
         const bloatRatio = t.rows > 0 ? (t.dead / t.rows) * 100 : 0;
         return `
         <tr>
-            <td class="font-mono text-[10px] text-blue-600 dark:text-[#6cb4ee]">${t.name}</td>
+            <td class="font-mono text-[10px] text-blue-600 dark:text-[#6cb4ee]">${esc(t.name)}</td>
             <td class="font-mono text-[10px] text-slate-600 dark:text-slate-400">${fmtNum(t.dead)}</td>
             <td class="font-mono text-[10px] ${bloatRatio > 15 ? 'text-rose-600 dark:text-rose-400 font-bold' : bloatRatio > 5 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500 dark:text-slate-500'}">${bloatRatio.toFixed(1)}%</td>
             <td>${healthBadge(bloatRatio)}</td>
@@ -379,7 +380,7 @@ async function loadDashboard() {
         configKeys.forEach(key => {
             const el = document.getElementById(`conf_${key}`);
             if (el && settings[key] !== undefined) {
-                el.innerHTML = `<span class="text-slate-500 dark:text-slate-400">${key} =</span> <span class="text-emerald-600 dark:text-emerald-400 font-bold ml-1">${settings[key]}</span>`;
+                el.innerHTML = `<span class="text-slate-500 dark:text-slate-400">${key} =</span> <span class="text-emerald-600 dark:text-emerald-400 font-bold ml-1">${esc(settings[key])}</span>`;
             }
         });
     }
@@ -393,14 +394,14 @@ async function loadDashboard() {
         : missingIndexCandidates.map(t => {
             return `
             <tr>
-                <td class="font-mono text-[10px] text-blue-600 dark:text-blue-400">${t.schema_name}</td>
-                <td class="font-mono text-[10px] text-blue-600 dark:text-[#6cb4ee] font-bold">${t.name}</td>
+                <td class="font-mono text-[10px] text-blue-600 dark:text-blue-400">${esc(t.schema_name)}</td>
+                <td class="font-mono text-[10px] text-blue-600 dark:text-[#6cb4ee] font-bold">${esc(t.name)}</td>
                 <td class="font-mono text-[10px] text-slate-600 dark:text-slate-400">${fmtNum(t.rows)}</td>
                 <td class="font-mono text-[10px] text-rose-600 dark:text-rose-400 font-bold">${fmtNum(t.seq_scan)}</td>
                 <td class="font-mono text-[10px] text-rose-600 dark:text-rose-400">${fmtNum(t.seq_tup_read)}</td>
                 <td class="font-mono text-[10px] text-emerald-600 dark:text-emerald-400">${fmtNum(t.idx_scan)}</td>
                 <td>
-                    <button onclick="window.fetchTableDetails('${t.db_name}','${t.schema_name}','${t.name}')" class="text-[8px] bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded hover:bg-indigo-500 hover:text-white transition-all font-bold">ANALYZE TABLE</button>
+                    <button onclick="window.fetchTableDetails(${jsArg(t.db_name)},${jsArg(t.schema_name)},${jsArg(t.name)})" class="text-[8px] bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded hover:bg-indigo-500 hover:text-white transition-all font-bold">ANALYZE TABLE</button>
                 </td>
             </tr>`;
         }).join('')
@@ -450,7 +451,7 @@ window.onload = async () => {
         if (srvData.status === 'success' && srvData.servers.length > 0) {
             const selectEl = document.getElementById('serverSelect');
             if (selectEl) {
-                selectEl.innerHTML = srvData.servers.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+                selectEl.innerHTML = srvData.servers.map(s => `<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');
             }
             selectedServer = srvData.servers[0].id;
             setActiveServer(selectedServer);

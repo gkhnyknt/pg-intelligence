@@ -387,12 +387,15 @@ def get_log_files(server: str):
 def get_log_content(server: str, filename: str):
     try:
         config = get_servers().get(server)
+        if not config: return {"status": "error", "message": "Sunucu bulunamadı."}
+
         log_path = config.get("log_path", "")
         if not log_path: return {"status": "error", "message": "Log path ayarlanmamış."}
             
-        file_path = os.path.join(log_path, filename)
-        if not os.path.abspath(file_path).startswith(os.path.abspath(log_path)):
+        # Yalnızca log klasörünün içindeki düz bir .csv dosya adı kabul edilir
+        if os.path.basename(filename) != filename or not filename.lower().endswith(".csv"):
              return {"status": "error", "message": "Geçersiz dosya yolu isteği."}
+        file_path = os.path.join(log_path, filename)
              
         if not os.path.exists(file_path):
              return {"status": "error", "message": "Dosya bulunamadı."}

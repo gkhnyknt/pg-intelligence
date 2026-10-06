@@ -1,5 +1,6 @@
 import { fetchTableDetailsApi, explainQueryApi, terminateQueryApi } from './api.js';
 import { analyzeExplainPlan } from './explain.js';
+import { escapeHtml as esc } from './utils.js';
 
 let activeServerRef = null;
 let activeDbRef = 'postgres';
@@ -139,8 +140,8 @@ export function showToast(title, message, type = 'error') {
 
     toast.innerHTML = `
         <div class="flex-1">
-            <p class="text-xs font-bold ${titleClass} mb-1">${title}</p>
-            <p class="text-[10px] leading-relaxed ${msgClass} break-all">${message}</p>
+            <p class="text-xs font-bold ${titleClass} mb-1">${esc(title)}</p>
+            <p class="text-[10px] leading-relaxed ${msgClass} break-all">${esc(message)}</p>
         </div>
         <button onclick="this.closest('.toast').remove()" class="w-6 h-6 flex items-center justify-center rounded-md transition-colors ${closeClass} shrink-0">
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -304,7 +305,7 @@ window.openErrorModal = (time, user, db, sev, b64Msg, b64Query) => {
     
     const queryEl = document.getElementById('errModalQuery');
     if (queryEl) {
-        queryEl.innerHTML = (query || '-').replace(
+        queryEl.innerHTML = esc(query || '-').replace(
             /\b(SELECT|FROM|WHERE|AND|OR|JOIN|LEFT|RIGHT|INNER|OUTER|ON|UPDATE|SET|INSERT|INTO|VALUES|DELETE|BEGIN|COMMIT|ROLLBACK|CREATE|INDEX|TABLE|CONCURRENTLY)\b/gi,
             '<span class="sql-kw">$1</span>'
         );
@@ -346,7 +347,7 @@ window.openModal = (pid, user, state, dur, b64Sql) => {
     
     const sqlEl = document.getElementById('modalSql');
     if(sqlEl) {
-        sqlEl.innerHTML = sql.replace(
+        sqlEl.innerHTML = esc(sql).replace(
             /\b(SELECT|FROM|WHERE|AND|OR|JOIN|LEFT|RIGHT|INNER|OUTER|ON|UPDATE|SET|INSERT|INTO|VALUES|DELETE|BEGIN|COMMIT|ROLLBACK|VACUUM|ANALYZE|EXPLAIN|WITH|AS|UNION|GROUP\s+BY|ORDER\s+BY|HAVING|LIMIT|OFFSET|DISTINCT|COUNT|SUM|AVG|MAX|MIN|CASE|WHEN|THEN|ELSE|END|NOT|IN|EXISTS|LIKE|ILIKE|RETURNING|CREATE|INDEX|TABLE|CONCURRENTLY)\b/gi,
             '<span class="sql-kw">$1</span>'
         );
@@ -431,11 +432,11 @@ window.fetchTableDetails = async (db, schema, table) => {
             if(colBody) {
                 colBody.innerHTML = data.columns.map(c => `
                     <tr>
-                        <td class="font-mono text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">${c.column_name}</td>
-                        <td class="font-mono text-[10px] text-blue-600 dark:text-blue-400">${c.data_type}</td>
-                        <td class="font-mono text-[10px] text-slate-600 dark:text-slate-500">${c.character_maximum_length || '—'}</td>
-                        <td class="font-mono text-[10px] ${c.is_nullable === 'YES' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500'}">${c.is_nullable}</td>
-                        <td class="font-mono text-[10px] text-slate-500">${c.column_default || '—'}</td>
+                        <td class="font-mono text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">${esc(c.column_name)}</td>
+                        <td class="font-mono text-[10px] text-blue-600 dark:text-blue-400">${esc(c.data_type)}</td>
+                        <td class="font-mono text-[10px] text-slate-600 dark:text-slate-500">${esc(c.character_maximum_length || '—')}</td>
+                        <td class="font-mono text-[10px] ${c.is_nullable === 'YES' ? 'text-amber-600 dark:text-amber-400' : 'text-slate-500'}">${esc(c.is_nullable)}</td>
+                        <td class="font-mono text-[10px] text-slate-500">${esc(c.column_default || '—')}</td>
                     </tr>
                 `).join('');
             }
@@ -444,8 +445,8 @@ window.fetchTableDetails = async (db, schema, table) => {
             if(idxBody) {
                 idxBody.innerHTML = (data.indexes || []).map(i => `
                     <tr>
-                        <td class="font-mono text-[10px] text-violet-600 dark:text-violet-400 font-bold">${i.indexname}</td>
-                        <td class="font-mono text-[10px] text-slate-600 dark:text-slate-400 break-all">${i.indexdef}</td>
+                        <td class="font-mono text-[10px] text-violet-600 dark:text-violet-400 font-bold">${esc(i.indexname)}</td>
+                        <td class="font-mono text-[10px] text-slate-600 dark:text-slate-400 break-all">${esc(i.indexdef)}</td>
                     </tr>
                 `).join('') || '<tr><td colspan="2" class="text-center py-4 text-slate-500 text-xs">No indexes</td></tr>';
             }

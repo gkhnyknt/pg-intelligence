@@ -3,6 +3,8 @@
 // v2.0 — Derinlemesine Parse + Nokta Atışı Çözüm Önerileri
 // ============================================================
 
+import { escapeHtml } from './utils.js';
+
 // ─── Yardımcı: Tüm düğümleri (nodes) recursive parse et ───────────────────────
 function parseNodes(planText) {
     const nodes = [];
@@ -327,7 +329,7 @@ export function analyzeExplainPlan(planText) {
 
     if (planText.includes('Incremental Sort')) {
         const keysMatch = planText.match(/Presorted Key:\s+(.+)/i);
-        insights.push(`🚀 <b>Incremental Sort</b> (Postgres 13+): Önceden sıralı kolonlar üzerinden sadece değişen kısım sıralandı${keysMatch ? ` (<code>${keysMatch[1]}</code> presorted)` : ''}. Büyük bir CPU tasarrufu.`);
+        insights.push(`🚀 <b>Incremental Sort</b> (Postgres 13+): Önceden sıralı kolonlar üzerinden sadece değişen kısım sıralandı${keysMatch ? ` (<code>${escapeHtml(keysMatch[1])}</code> presorted)` : ''}. Büyük bir CPU tasarrufu.`);
     }
 
     // ════════════════════════════════════════════════════════════════
