@@ -3,8 +3,11 @@ import sys
 import csv
 import glob
 import datetime
+import hmac
+import secrets
+import time
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -32,11 +35,62 @@ app = FastAPI(title="PostgreSQL Intelligence API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
-    allow_credentials=False, 
+    # Sadece geliştirme sunucuları (Live Server / http.server) farklı origin'den gelir
+    allow_origins=[
+        "http://localhost:3000", "http://127.0.0.1:3000",
+        "http://localhost:5500", "http://127.0.0.1:5500",
+    ],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ─── KİMLİK DOĞRULAMA ───
+APP_USER = os.getenv("APP_USER", "admin")
+APP_PASSWORD = os.getenv("APP_PASSWORD")
+if not APP_PASSWORD:
+    APP_PASSWORD = secrets.token_urlsafe(12)
+    print(f"[PG Intelligence] APP_PASSWORD .env icinde tanimli degil. Gecici sifre ({APP_USER}): {APP_PASSWORD}")
+
+SESSION_COOKIE = "pg_session"
+SESSION_TTL = 12 * 3600
+sessions = {}  # token -> bitiş zamanı (epoch)
+
+def require_auth(request: Request):
+    token = request.cookies.get(SESSION_COOKIE)
+    expiry = sessions.get(token) if token else None
+    if not expiry or expiry < time.time():
+        sessions.pop(token, None)
+        raise HTTPException(status_code=401, detail="Oturum açılmamış veya süresi dolmuş.")
+
+AUTH = [Depends(require_auth)]
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+@app.post("/api/login")
+def api_login(req: LoginRequest, response: Response):
+    user_ok = hmac.compare_digest(req.username.encode(), APP_USER.encode())
+    pass_ok = hmac.compare_digest(req.password.encode(), APP_PASSWORD.encode())
+    if not (user_ok and pass_ok):
+        time.sleep(1)
+        raise HTTPException(status_code=401, detail="Hatalı kullanıcı adı veya şifre!")
+
+    token = secrets.token_urlsafe(32)
+    sessions[token] = time.time() + SESSION_TTL
+    response.set_cookie(SESSION_COOKIE, token, max_age=SESSION_TTL, httponly=True, samesite="strict")
+    return {"status": "success"}
+
+@app.post("/api/logout")
+def api_logout(request: Request, response: Response):
+    sessions.pop(request.cookies.get(SESSION_COOKIE), None)
+    response.delete_cookie(SESSION_COOKIE)
+    return {"status": "success"}
+
+@app.get("/api/me", dependencies=AUTH)
+def api_me():
+    return {"status": "success", "user": APP_USER}
 
 # ─── FRONTEND (ARAYÜZ) SUNUCU AYARLARI ───
 def get_base_path():
@@ -125,13 +179,13 @@ class TerminateRequest(BaseModel):
     db: str
     pid: int
 
-@app.get("/api/servers")
+@app.get("/api/servers", dependencies=AUTH)
 def api_get_servers():
     servers = get_servers()
     server_list = [{"id": s["id"], "name": s["name"]} for s in servers.values()]
     return {"status": "success", "servers": server_list}
 
-@app.get("/api/monitoring")
+@app.get("/api/monitoring", dependencies=AUTH)
 def get_monitoring_data(server: Optional[str] = None, db: Optional[str] = None):
     try:
         config = get_db_config(server, db)
@@ -223,7 +277,7 @@ def get_monitoring_data(server: Optional[str] = None, db: Optional[str] = None):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-@app.get("/api/table_details")
+@app.get("/api/table_details", dependencies=AUTH)
 def get_table_details(server: str, db: str, schema: str, table: str):
     try:
         config = get_db_config(server, db)
@@ -242,22 +296,35 @@ def get_table_details(server: str, db: str, schema: str, table: str):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-@app.post("/api/explain")
+@app.post("/api/explain", dependencies=AUTH)
 def explain_query(req: ExplainRequest):
     try:
+        # Tek ifade garantisi: sondaki ';' temizlenir, başka ';' varsa reddedilir.
+        # (String içindeki ';' de reddedilir; bilinçli olarak katı tutuldu.)
+        query = req.query.strip().rstrip(";").strip()
+        if not query:
+            return {"status": "error", "message": "Analiz edilecek sorgu boş."}
+        if ";" in query:
+            return {"status": "error", "message": "Güvenlik nedeniyle yalnızca tek bir SQL ifadesi analiz edilebilir (';' içeren sorgular reddedilir)."}
+
         config = get_db_config(req.server, req.db)
         conn = psycopg2.connect(**config)
-        conn.autocommit = True 
-        cur = conn.cursor() 
-        cur.execute(f"EXPLAIN {req.query}")
-        plan_rows = cur.fetchall()
-        cur.close()
-        conn.close()
+        try:
+            conn.set_session(readonly=True, autocommit=False)
+            cur = conn.cursor()
+            cur.execute("SET LOCAL statement_timeout = '10s'")
+            # Seçenek listesi sabit verildiği için sorgu ANALYZE gibi bir EXPLAIN seçeneği ekleyemez
+            cur.execute(f"EXPLAIN (ANALYZE FALSE) {query}")
+            plan_rows = cur.fetchall()
+            cur.close()
+        finally:
+            conn.rollback()
+            conn.close()
         return {"status": "success", "plan": "\n".join([row[0] for row in plan_rows])}
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-@app.post("/api/terminate")
+@app.post("/api/terminate", dependencies=AUTH)
 def terminate_query(req: TerminateRequest):
     try:
         config = get_db_config(req.server, req.db)
@@ -277,7 +344,7 @@ def terminate_query(req: TerminateRequest):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-@app.get("/api/config")
+@app.get("/api/config", dependencies=AUTH)
 def get_config(server: Optional[str] = None, db: Optional[str] = None):
     try:
         config_db = get_db_config(server, db)
@@ -292,7 +359,7 @@ def get_config(server: Optional[str] = None, db: Optional[str] = None):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-@app.get("/api/logs/files")
+@app.get("/api/logs/files", dependencies=AUTH)
 def get_log_files(server: str):
     try:
         config = get_servers().get(server)
@@ -316,7 +383,7 @@ def get_log_files(server: str):
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-@app.get("/api/logs/content")
+@app.get("/api/logs/content", dependencies=AUTH)
 def get_log_content(server: str, filename: str):
     try:
         config = get_servers().get(server)

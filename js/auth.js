@@ -1,47 +1,19 @@
 // js/auth.js
-export function checkAuth() {
-    if (sessionStorage.getItem('pg_auth_token') !== 'true') {
-        window.location.href = 'login.html';
-    }
+import { fetchMeApi, logoutApi } from './api.js';
+
+// Oturum sunucuda doğrulanır; geçersizse api.js giriş sayfasına yönlendirir.
+export async function checkAuth() {
+    try {
+        await fetchMeApi();
+    } catch (e) {}
 }
 
-export function handleLogout() {
-    sessionStorage.removeItem('pg_auth_token');
+export async function handleLogout() {
+    try {
+        await logoutApi();
+    } catch (e) {}
     window.location.href = 'login.html';
 }
 
-export function handleLogin(event) {
-    event.preventDefault(); 
-    
-    const userStr = document.getElementById('username').value.trim();
-    const passStr = document.getElementById('password').value.trim();
-    const errorBox = document.getElementById('errorBox');
-    
-    document.getElementById('btnText').innerText = 'Doğrulanıyor...';
-    document.getElementById('btnIcon').classList.add('hidden');
-    document.getElementById('spinner').classList.remove('hidden');
-    document.getElementById('submitBtn').disabled = true;
-    errorBox.classList.add('hidden');
-
-    const expectedUser = 'YWRtaW4=';         // "admin"
-    const expectedPass = 'MTIzNDU2'; // "123456"
-
-    setTimeout(() => {
-        if (btoa(userStr) === expectedUser && btoa(passStr) === expectedPass) {
-            sessionStorage.setItem('pg_auth_token', 'true');
-            window.location.href = 'index.html'; 
-        } else {
-            errorBox.innerText = 'Hatalı kullanıcı adı veya şifre!';
-            errorBox.classList.remove('hidden');
-            
-            document.getElementById('btnText').innerText = 'Giriş Yap';
-            document.getElementById('btnIcon').classList.remove('hidden');
-            document.getElementById('spinner').classList.add('hidden');
-            document.getElementById('submitBtn').disabled = false;
-        }
-    }, 800); 
-}
-
-// HTML'deki onclick ve onsubmit eventleri için window objesine atama
+// HTML'deki onclick eventleri için window objesine atama
 window.handleLogout = handleLogout;
-window.handleLogin = handleLogin;

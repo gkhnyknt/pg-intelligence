@@ -86,12 +86,16 @@ Tarayıcınızda şu adrese gidin:
 
 http://localhost:3000
 
-## Varsayılan Giriş Bilgileri:
+## Giriş Bilgileri:
+
+Panel kullanıcı adı ve şifresi `.env` dosyasından okunur ve sunucu tarafında doğrulanır:
 
 ```ini
-Kullanıcı Adı: admin
-Şifre: 123456
+APP_USER=admin
+APP_PASSWORD=guclu-bir-sifre
 ```
+
+`APP_PASSWORD` tanımlı değilse uygulama her açılışta rastgele bir geçici şifre üretir ve konsola yazar.
 
 ## 🛡️ Mimari ve Güvenlik
 
